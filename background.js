@@ -132,6 +132,7 @@ chrome.notifications.onClicked.addListener(() => {
         "https://chatgpt.com/*",
         "https://claude.ai/*",
         "https://gemini.google.com/*",
+        "https://www.perplexity.ai/*",
       ],
     },
     (tabs) => {
@@ -166,6 +167,11 @@ const LLM_ENDPOINTS = [
     pattern:
       "https://claude.ai/api/organizations/*/chat_conversations/*/completion",
     icon: "icons/claude128.png",
+  },
+  {
+    name: "Perplexity",
+    pattern: "https://www.perplexity.ai/rest/sse/perplexity_ask",
+    icon: "icons/perplexity128.png",
   },
   // To add a new LLM: just add a new entry here with name, pattern, and icon!
 ];
