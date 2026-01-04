@@ -4,12 +4,13 @@ A browser extension that notifies you when ChatGPT, Claude, or Gemini finishes a
 
 ## Features
 
-- Detects when AI assistants (ChatGPT, Claude, Gemini) complete their responses
-- Shows a browser notification with the site's favicon
-- Displays your question context in the notification
-- Classic ICQ notification sound
-- Auto-dismisses notification after 5 seconds
-- Click notification to return to the AI chat tab
+- **Multi-Platform Support**: Works with ChatGPT, Claude, and Gemini
+- **Smart Detection**: Uses Chrome's webRequest API for reliable detection even in background tabs
+- **Volume Control**: Adjustable notification sound with 4 levels (off, soft, balanced, loud)
+- **Rich Notifications**: Shows platform-specific icons and your question context
+- **Classic ICQ Sound**: That nostalgic "Uh-Oh!" notification sound
+- **Auto-Dismiss**: Notifications disappear automatically after 5 seconds
+- **Quick Navigation**: Click notification to return to the AI chat tab
 
 ## Installation
 
@@ -27,36 +28,68 @@ A browser extension that notifies you when ChatGPT, Claude, or Gemini finishes a
 
 ## Usage
 
-1. Open ChatGPT, Claude, or Gemini:
+### Basic Usage
 
+1. Open any supported AI chat platform:
    - ChatGPT: https://chat.openai.com or https://chatgpt.com
    - Claude: https://claude.ai
    - Gemini: https://gemini.google.com
 
-2. Ask a question
+2. Ask a question and continue with other tasks (notifications work even in background tabs!)
 
 3. When the AI finishes generating the response, you'll receive a notification with:
-
-   - The site's favicon
-   - Your original question (truncated if needed)
+   - Platform-specific icon (ChatGPT, Claude, or Gemini logo)
+   - Your original question (truncated to 100 chars if needed)
    - The classic ICQ notification sound
 
-4. Click the notification to bring the AI chat tab back into focus (optional)
+4. Click the notification to bring the AI chat tab back into focus
+
+### Volume Control
+
+Click the extension icon in your browser toolbar to access volume settings:
+
+- **Off**: No sound (visual notification only)
+- **Soft**: 30% volume
+- **Balanced**: 60% volume (default)
+- **Loud**: 100% volume
+
+Settings are automatically saved and synced across your devices via Chrome sync.
 
 ## How It Works
 
-- **content.js**: Monitors AI chat pages for response completion by watching for the "Stop" button, extracts the favicon and your question context
-- **background.js**: Handles browser notifications with the favicon and context, plays the ICQ sound
-- **offscreen.js**: Handles audio playback in the background
-- **manifest.json**: Defines the extension configuration and permissions
+The extension uses a hybrid approach for maximum reliability:
+
+- **background.js**:
+  - Monitors network requests via `chrome.webRequest` API to detect when AI responses complete
+  - Uses a unified `LLM_ENDPOINTS` configuration for easy addition of new platforms
+  - Handles browser notifications with platform-specific icons and context
+  - Manages volume preferences via `chrome.storage.sync`
+
+- **content.js**:
+  - Extracts your question context from the chat page
+  - Provides platform-specific information to the background script
+  - Shows an in-page banner to request notification permissions if needed
+
+- **offscreen.js**:
+  - Handles audio playback in the background (Chrome requirement for service workers)
+  - Applies volume levels from user preferences
+
+- **popup.html/popup.js**:
+  - Minimalist volume control interface
+  - Test sound button to preview volume levels
+
+- **manifest.json**:
+  - Defines extension configuration, permissions, and supported domains
 
 ## Permissions
 
 The extension requires:
 
-- `notifications`: To display browser notifications
-- `offscreen`: To play notification sounds in the background
-- Host permissions for ChatGPT, Claude, and Gemini domains to run the content script
+- **notifications**: To display browser notifications
+- **offscreen**: To play notification sounds in the background
+- **webRequest**: To monitor network requests and detect AI response completion
+- **storage**: To save volume preferences across sessions
+- **Host permissions**: Access to ChatGPT, Claude, and Gemini domains to run the content script and monitor API requests
 
 ## Troubleshooting
 
@@ -113,20 +146,32 @@ Even if your browser allows notifications, macOS can block them at the system le
 
 ## Customization
 
-You can customize the extension by:
+### Via UI
+- **Volume Control**: Click the extension icon to adjust notification sound volume (off/soft/balanced/loud)
 
-- Changing notification duration in `background.js` (currently 5 seconds)
-- Modifying the notification message
-- Adding custom sounds
-- Adjusting the detection logic in `content.js`
+### Via Code
+- **Notification Duration**: Edit timeout in `background.js` (default: 5 seconds)
+- **Volume Levels**: Adjust `VOLUME_LEVELS` mapping in `offscreen.js`
+- **Notification Sound**: Replace `sounds/icq.mp3` with your custom sound
+- **Add New AI Platforms**: Simply add a new entry to `LLM_ENDPOINTS` array in `background.js`:
+  ```javascript
+  {
+    name: "YourAI",
+    pattern: "https://yourai.com/api/chat/completion",
+    icon: "icons/yourai128.png"
+  }
+  ```
+- **Message Context**: Adjust selectors in `getLatestUserMessage()` in `content.js`
 
 ## Notes
 
-- The extension works by monitoring DOM changes on AI chat pages
-- If ChatGPT, Claude, or Gemini update their UI significantly, the selectors may need to be updated
-- The extension only works when one of the supported AI chat sites is open in your browser
-- The favicon is converted to a data URL to avoid CORS issues
-- User questions are truncated to 100 characters for notification display
+- **Network Monitoring**: Uses Chrome's `webRequest` API to detect completion of AI responses - works reliably even in background tabs
+- **Platform Icons**: Each platform (ChatGPT, Claude, Gemini) has its own icon in notifications
+- **Context Extraction**: User questions are extracted from the DOM and truncated to 100 characters for notification display
+- **Volume Sync**: Volume preferences sync across devices using `chrome.storage.sync`
+- **Extensibility**: Adding support for new AI platforms requires only adding an entry to `LLM_ENDPOINTS` array
+- **UI Updates**: If platforms change their UI, you may need to update selectors in `content.js` for context extraction
+- **Background Compatibility**: Works perfectly when AI chat tabs are in the background
 
 ## Credits
 
