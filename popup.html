@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>aicq</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 320px;
+      padding: 24px;
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+      background: #fafafa;
+      color: #171717;
+    }
+
+    .header {
+      margin-bottom: 24px;
+    }
+
+    .logo {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: #171717;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 11px;
+      color: #737373;
+      font-weight: 400;
+    }
+
+    .volume-options {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .volume-option {
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 12px 14px;
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+    }
+
+    .volume-option:hover {
+      border-color: #d4d4d4;
+      background: #fafafa;
+    }
+
+    .volume-option.selected {
+      border-color: #171717;
+      background: #fafafa;
+    }
+
+    .volume-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .radio-dot {
+      width: 16px;
+      height: 16px;
+      border: 1.5px solid #d4d4d4;
+      border-radius: 50%;
+      margin-right: 12px;
+      position: relative;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .volume-option:hover .radio-dot {
+      border-color: #a3a3a3;
+    }
+
+    .volume-option.selected .radio-dot {
+      border-color: #171717;
+    }
+
+    .radio-dot::after {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #171717;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .volume-option.selected .radio-dot::after {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .volume-name {
+      font-size: 13px;
+      font-weight: 400;
+      color: #171717;
+      letter-spacing: -0.01em;
+    }
+
+    .test-button {
+      width: 100%;
+      padding: 10px;
+      background: #171717;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      letter-spacing: -0.01em;
+    }
+
+    .test-button:hover {
+      background: #262626;
+    }
+
+    .test-button:active {
+      transform: scale(0.98);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e5e5;
+      font-size: 10px;
+      color: #a3a3a3;
+      letter-spacing: 0.02em;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">aicq</div>
+    <div class="subtitle">notification volume</div>
+  </div>
+
+  <div class="volume-options">
+    <label class="volume-option" data-volume="off">
+      <input type="radio" name="volume" value="off">
+      <div class="radio-dot"></div>
+      <span class="volume-name">off</span>
+    </label>
+
+    <label class="volume-option" data-volume="soft">
+      <input type="radio" name="volume" value="soft">
+      <div class="radio-dot"></div>
+      <span class="volume-name">soft</span>
+    </label>
+
+    <label class="volume-option" data-volume="balanced">
+      <input type="radio" name="volume" value="balanced" checked>
+      <div class="radio-dot"></div>
+      <span class="volume-name">balanced</span>
+    </label>
+
+    <label class="volume-option" data-volume="loud">
+      <input type="radio" name="volume" value="loud">
+      <div class="radio-dot"></div>
+      <span class="volume-name">loud</span>
+    </label>
+  </div>
+
+  <button class="test-button" id="testSound">test sound</button>
+
+  <div class="footer">
+    v1.0.0
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

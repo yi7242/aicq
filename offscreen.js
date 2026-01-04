@@ -1,15 +1,33 @@
 // Offscreen document script to play notification sound
 
+// Volume levels mapping
+const VOLUME_LEVELS = {
+  'off': 0,
+  'soft': 0.3,
+  'balanced': 0.6,
+  'loud': 1.0
+};
+
 chrome.runtime.onMessage.addListener((message) => {
   if (message.type === "PLAY_SOUND") {
-    console.log("[OFFSCREEN] Received request to play sound");
-    playSound();
+    const volumeLevel = message.volume || 'balanced';
+    console.log("[OFFSCREEN] Received request to play sound at volume:", volumeLevel);
+    playSound(volumeLevel);
   }
 });
 
-function playSound() {
+function playSound(volumeLevel) {
+  // Don't play if volume is off
+  if (volumeLevel === 'off') {
+    console.log("[OFFSCREEN] Sound disabled (volume: off)");
+    return;
+  }
+
   const audio = new Audio(chrome.runtime.getURL("sounds/icq.mp3"));
-  audio.volume = 1.0;
+  audio.volume = VOLUME_LEVELS[volumeLevel] || VOLUME_LEVELS['balanced'];
+
+  console.log("[OFFSCREEN] Playing sound at volume:", volumeLevel, "=", audio.volume);
+
   audio
     .play()
     .then(() => {
