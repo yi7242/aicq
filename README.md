@@ -15,24 +15,20 @@ A browser extension that notifies you when ChatGPT, Claude, or Gemini finishes a
 
 1. Download or clone this repository to your local machine
 
-2. Create placeholder icons (or use your own):
+2. Open Chrome and navigate to `chrome://extensions/`
 
-   - You'll need three PNG files: `icon16.png`, `icon48.png`, and `icon128.png`
-   - For quick testing, you can remove the `icons` field from `manifest.json`
+3. Enable "Developer mode" using the toggle in the top-right corner
 
-3. Open Chrome and navigate to `chrome://extensions/`
+4. Click "Load unpacked" button
 
-4. Enable "Developer mode" using the toggle in the top-right corner
+5. Select the directory containing this extension (`NotificationAI`)
 
-5. Click "Load unpacked" button
-
-6. Select the directory containing this extension (`NotificationAI`)
-
-7. The extension should now be loaded and active
+6. The extension should now be loaded and active
 
 ## Usage
 
 1. Open ChatGPT, Claude, or Gemini:
+
    - ChatGPT: https://chat.openai.com or https://chatgpt.com
    - Claude: https://claude.ai
    - Gemini: https://gemini.google.com
@@ -40,6 +36,7 @@ A browser extension that notifies you when ChatGPT, Claude, or Gemini finishes a
 2. Ask a question
 
 3. When the AI finishes generating the response, you'll receive a notification with:
+
    - The site's favicon
    - Your original question (truncated if needed)
    - The classic ICQ notification sound
@@ -68,6 +65,7 @@ If notifications aren't appearing, you need to enable them both in your browser 
 ### Step 1: Enable Notifications within Your Browser
 
 #### Safari
+
 1. Open Safari and navigate to the AI chat website
 2. Go to **Safari menu** → **Settings** (or Preferences)
 3. Click the **Websites** tab
@@ -76,6 +74,7 @@ If notifications aren't appearing, you need to enable them both in your browser 
 6. If not listed, visit the site and look for the "Allow Notifications" prompt
 
 #### Google Chrome
+
 1. Open Chrome
 2. Click the three vertical dots (top right) → **Settings**
 3. Click **Privacy and security** → **Site settings**
@@ -85,6 +84,7 @@ If notifications aren't appearing, you need to enable them both in your browser 
 7. Alternatively, when you first visit a site, click **Allow** when Chrome asks
 
 #### Firefox
+
 1. Open Firefox
 2. Click the three horizontal lines (top right) → **Settings**
 3. Click **Privacy & Security** on the left
