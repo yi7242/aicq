@@ -6,10 +6,22 @@ const VOLUME_LEVELS = {
   'loud': 1.0
 };
 
+// Storage keys
+const STORAGE_KEYS = {
+  VOLUME_LEVEL: 'volumeLevel',
+  PUSH_NOTIFICATIONS: 'pushNotificationsEnabled'
+};
+
+// Default values
+const DEFAULTS = {
+  VOLUME_LEVEL: 'balanced',
+  PUSH_NOTIFICATIONS: true
+};
+
 // Load saved volume preference
 async function loadVolumePreference() {
-  const result = await chrome.storage.sync.get(['volumeLevel']);
-  const savedVolume = result.volumeLevel || 'balanced'; // Default to balanced
+  const result = await chrome.storage.sync.get([STORAGE_KEYS.VOLUME_LEVEL]);
+  const savedVolume = result[STORAGE_KEYS.VOLUME_LEVEL] || DEFAULTS.VOLUME_LEVEL;
 
   // Select the radio button
   const radio = document.querySelector(`input[value="${savedVolume}"]`);
@@ -17,6 +29,21 @@ async function loadVolumePreference() {
     radio.checked = true;
     updateSelectedOption(savedVolume);
   }
+}
+
+// Load saved push notifications preference
+async function loadPushNotificationPreference() {
+  const result = await chrome.storage.sync.get([STORAGE_KEYS.PUSH_NOTIFICATIONS]);
+  const enabled = result[STORAGE_KEYS.PUSH_NOTIFICATIONS] !== undefined
+    ? result[STORAGE_KEYS.PUSH_NOTIFICATIONS]
+    : DEFAULTS.PUSH_NOTIFICATIONS;
+
+  const toggle = document.getElementById('pushNotificationsToggle');
+  if (toggle) {
+    toggle.checked = enabled;
+  }
+
+  console.log('[POPUP] Push notifications loaded:', enabled);
 }
 
 // Update visual selection
@@ -35,8 +62,14 @@ function updateSelectedOption(volume) {
 
 // Save volume preference
 async function saveVolumePreference(volume) {
-  await chrome.storage.sync.set({ volumeLevel: volume });
+  await chrome.storage.sync.set({ [STORAGE_KEYS.VOLUME_LEVEL]: volume });
   console.log('[POPUP] Volume saved:', volume);
+}
+
+// Save push notifications preference
+async function savePushNotificationPreference(enabled) {
+  await chrome.storage.sync.set({ [STORAGE_KEYS.PUSH_NOTIFICATIONS]: enabled });
+  console.log('[POPUP] Push notifications saved:', enabled);
 }
 
 // Test sound with current volume
@@ -53,7 +86,15 @@ async function testSound() {
 
 // Initialize popup
 document.addEventListener('DOMContentLoaded', async () => {
+  // Dynamically set version from manifest
+  const manifest = chrome.runtime.getManifest();
+  const footerVersion = document.querySelector('.footer');
+  if (footerVersion && manifest.version) {
+    footerVersion.textContent = `v${manifest.version}`;
+  }
+
   await loadVolumePreference();
+  await loadPushNotificationPreference();
 
   // Add change listeners to radio buttons
   document.querySelectorAll('input[name="volume"]').forEach(radio => {
@@ -76,6 +117,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
   });
+
+  // Push notifications toggle handler
+  const pushToggle = document.getElementById('pushNotificationsToggle');
+  if (pushToggle) {
+    pushToggle.addEventListener('change', async (e) => {
+      const enabled = e.target.checked;
+      await savePushNotificationPreference(enabled);
+
+      // If enabling notifications, request permission if not granted
+      if (enabled && Notification.permission === 'default') {
+        await Notification.requestPermission();
+      }
+    });
+  }
 
   // Test sound button
   document.getElementById('testSound').addEventListener('click', testSound);

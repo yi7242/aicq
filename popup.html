@@ -115,6 +115,77 @@
       letter-spacing: -0.01em;
     }
 
+    /* Push notifications toggle section */
+    .push-toggle-section {
+      margin-top: 16px;
+      margin-bottom: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #e5e5e5;
+    }
+
+    .push-toggle-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+    }
+
+    .push-toggle-label:hover {
+      border-color: #d4d4d4;
+      background: #fafafa;
+    }
+
+    .push-toggle-text {
+      font-size: 13px;
+      font-weight: 400;
+      color: #171717;
+      letter-spacing: -0.01em;
+    }
+
+    .push-toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #e5e5e5;
+      border-radius: 12px;
+      transition: background 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      flex-shrink: 0;
+    }
+
+    .push-toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .push-toggle-input:checked + .push-toggle-label .push-toggle-switch {
+      background: #171717;
+    }
+
+    .push-toggle-input:checked + .push-toggle-label .push-toggle-switch::after {
+      transform: translateX(20px);
+    }
+
+    .push-toggle-input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
     .test-button {
       width: 100%;
       padding: 10px;
@@ -151,7 +222,7 @@
 <body>
   <div class="header">
     <div class="logo">aicq</div>
-    <div class="subtitle">notification volume</div>
+    <div class="subtitle">notification settings</div>
   </div>
 
   <div class="volume-options">
@@ -180,10 +251,21 @@
     </label>
   </div>
 
+  <!-- Push notifications toggle -->
+  <div class="push-toggle-section">
+    <label>
+      <input type="checkbox" id="pushNotificationsToggle" class="push-toggle-input" checked>
+      <div class="push-toggle-label">
+        <span class="push-toggle-text">push notifications</span>
+        <div class="push-toggle-switch"></div>
+      </div>
+    </label>
+  </div>
+
   <button class="test-button" id="testSound">test sound</button>
 
   <div class="footer">
-    v1.0.0
+    v0.0.0
   </div>
 
   <script src="popup.js"></script>

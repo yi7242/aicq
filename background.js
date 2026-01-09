@@ -1,5 +1,16 @@
 // Background script to handle notifications
 
+// Storage keys (must match popup.js)
+const STORAGE_KEYS = {
+  VOLUME_LEVEL: 'volumeLevel',
+  PUSH_NOTIFICATIONS: 'pushNotificationsEnabled'
+};
+
+const DEFAULTS = {
+  VOLUME_LEVEL: 'balanced',
+  PUSH_NOTIFICATIONS: true
+};
+
 // Function to setup offscreen document for playing sound
 async function setupOffscreenDocument() {
   const existingContexts = await chrome.runtime.getContexts({
@@ -23,8 +34,8 @@ async function setupOffscreenDocument() {
 async function playNotificationSound() {
   try {
     // Get stored volume preference
-    const result = await chrome.storage.sync.get(["volumeLevel"]);
-    const volumeLevel = result.volumeLevel || "balanced";
+    const result = await chrome.storage.sync.get([STORAGE_KEYS.VOLUME_LEVEL]);
+    const volumeLevel = result[STORAGE_KEYS.VOLUME_LEVEL] || DEFAULTS.VOLUME_LEVEL;
 
     // Ensure offscreen document exists
     await setupOffscreenDocument();
@@ -40,6 +51,22 @@ async function playNotificationSound() {
     );
   } catch (error) {
     console.error("[BACKGROUND] Failed to play sound:", error);
+  }
+}
+
+// Check if push notifications should be shown
+async function shouldShowPushNotification() {
+  try {
+    const result = await chrome.storage.sync.get([STORAGE_KEYS.PUSH_NOTIFICATIONS]);
+    const prefEnabled = result[STORAGE_KEYS.PUSH_NOTIFICATIONS] !== undefined
+      ? result[STORAGE_KEYS.PUSH_NOTIFICATIONS]
+      : DEFAULTS.PUSH_NOTIFICATIONS;
+
+    const hasPermission = Notification.permission === 'granted';
+    return prefEnabled && hasPermission;
+  } catch (error) {
+    console.error('[BACKGROUND] Error checking push notification preference:', error);
+    return false;
   }
 }
 
@@ -61,10 +88,20 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   }
 
   if (message.type === "RESPONSE_COMPLETE") {
-    console.log("[BACKGROUND] Creating notification...");
+    console.log("[BACKGROUND] Processing response complete...");
 
-    // Play notification sound
+    // Play notification sound (always plays, independent of push notifications)
     playNotificationSound();
+
+    // Check if we should show push notification
+    const shouldShow = await shouldShowPushNotification();
+
+    if (!shouldShow) {
+      console.log("[BACKGROUND] Push notifications disabled or no permission - skipping notification");
+      return true;
+    }
+
+    console.log("[BACKGROUND] Creating push notification...");
 
     // Use platform icon from message
     const iconPath = message.platformIcon || "icons/icon128.png";
@@ -195,6 +232,17 @@ async function handleLLMCompletion(details, platformName, fallbackIcon) {
 
   console.log(`[AICQ-WEBR] ${platformName} completion for tab:`, details.tabId);
 
+  // Play notification sound (always plays, independent of push notifications)
+  playNotificationSound();
+
+  // Check if we should show push notification
+  const shouldShow = await shouldShowPushNotification();
+
+  if (!shouldShow) {
+    console.log("[AICQ-WEBR] Push notifications disabled or no permission - skipping notification");
+    return;
+  }
+
   try {
     // Ask content script for notification info (platform, context, icon)
     const response = await chrome.tabs.sendMessage(details.tabId, {
@@ -217,9 +265,6 @@ async function handleLLMCompletion(details, platformName, fallbackIcon) {
         priority: 2,
         requireInteraction: false,
       };
-
-      // Play sound
-      playNotificationSound();
 
       // Create notification
       chrome.notifications.create(notificationOptions, (notificationId) => {
