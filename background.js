@@ -133,6 +133,8 @@ chrome.notifications.onClicked.addListener(() => {
         "https://claude.ai/*",
         "https://gemini.google.com/*",
         "https://www.perplexity.ai/*",
+        "https://grok.com/*",
+        "https://chat.z.ai/*",
       ],
     },
     (tabs) => {
@@ -172,6 +174,16 @@ const LLM_ENDPOINTS = [
     name: "Perplexity",
     pattern: "https://www.perplexity.ai/rest/sse/perplexity_ask",
     icon: "icons/perplexity128.png",
+  },
+  {
+    name: "Grok",
+    pattern: "https://grok.com/rest/app-chat/conversations/*/responses",
+    icon: "icons/grok128.png",
+  },
+  {
+    name: "Z.ai",
+    pattern: "https://chat.z.ai/api/v2/chat/completions*",
+    icon: "icons/zai128.png",
   },
   // To add a new LLM: just add a new entry here with name, pattern, and icon!
 ];

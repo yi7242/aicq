@@ -11,6 +11,10 @@ function getPlatformName() {
     return "Gemini";
   } else if (hostname.includes("perplexity.ai")) {
     return "Perplexity";
+  } else if (hostname.includes("grok.com")) {
+    return "Grok";
+  } else if (hostname.includes("z.ai")) {
+    return "Z.ai";
   }
   return "AI Assistant";
 }
@@ -80,6 +84,8 @@ function getPlatformIcon(platform) {
     Claude: "icons/claude128.png",
     Gemini: "icons/gemini128.png",
     Perplexity: "icons/perplexity128.png",
+    Grok: "icons/grok128.png",
+    "Z.ai": "icons/zai128.png",
   };
 
   return iconMap[platform] || "icons/icon128.png";
@@ -99,105 +105,205 @@ function showNotificationBanner() {
     return;
   }
 
+  // Create container for centering
+  const container = document.createElement("div");
+  container.id = "aicq-banner-container";
+  container.style.cssText = `
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100%);
+    z-index: 2147483647;
+    pointer-events: auto;
+    animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  `;
+
+  // Inject keyframes
+  const style = document.createElement("style");
+  style.textContent = `
+    @keyframes slideIn {
+      from {
+        transform: translateX(-50%) translateY(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+      }
+    }
+    @keyframes slideOut {
+      from {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(-50%) translateY(-100%);
+        opacity: 0;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+
   const banner = document.createElement("div");
   banner.id = "aicq-notification-banner";
   banner.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
     padding: 16px 20px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    z-index: 999999;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
+    gap: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    font-size: 13px;
+    line-height: 1.4;
+    min-width: 380px;
+    max-width: 90vw;
+    pointer-events: auto;
   `;
 
+  // Icon container with subtle background
+  const iconWrapper = document.createElement("div");
+  iconWrapper.style.cssText = `
+    width: 64px;
+    height: 64px;
+    background: #fafafa;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  `;
+  const iconImg = document.createElement("img");
+  iconImg.src = chrome.runtime.getURL("icons/icon128.png");
+  iconImg.style.cssText = `
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    object-fit: contain;
+  `;
+  iconWrapper.appendChild(iconImg);
+
   const content = document.createElement("div");
-  content.style.cssText =
-    "flex: 1; display: flex; align-items: center; gap: 12px;";
+  content.style.cssText = `
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  `;
   content.innerHTML = `
-    <span style="font-size: 20px;">🔔</span>
-    <span>
-      <strong>AI-CQ:</strong> Enable notifications to get notified when your AI assistant finishes responding!
-    </span>
+    <span style="font-weight: 500; color: #171717; letter-spacing: -0.01em; font-size: 11px;">aicq</span>
+    <span style="font-weight: 500; color: #171717; letter-spacing: -0.01em;">Enable push notifications</span>
+    <span style="color: #737373; font-size: 12px;">See alerts when AI responses complete</span>
   `;
 
   const buttonContainer = document.createElement("div");
   buttonContainer.style.cssText =
-    "display: flex; gap: 8px; align-items: center;";
+    "display: flex; gap: 8px; align-items: center; pointer-events: auto;";
 
   const enableBtn = document.createElement("button");
-  enableBtn.textContent = "Enable Notifications";
+  enableBtn.textContent = "Enable";
   enableBtn.style.cssText = `
-    background: white;
-    color: #667eea;
+    background: #171717;
+    color: white;
     border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: 7px;
+    font-weight: 500;
     cursor: pointer;
-    font-size: 13px;
-    transition: transform 0.2s;
+    font-size: 12px;
+    letter-spacing: -0.01em;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    pointer-events: auto;
   `;
-  enableBtn.onmouseover = () => (enableBtn.style.transform = "scale(1.05)");
-  enableBtn.onmouseout = () => (enableBtn.style.transform = "scale(1)");
+
+  // Hover effects
+  enableBtn.onmouseenter = () => {
+    enableBtn.style.background = "#262626";
+    enableBtn.style.transform = "scale(1.02)";
+  };
+  enableBtn.onmouseleave = () => {
+    enableBtn.style.background = "#171717";
+    enableBtn.style.transform = "scale(1)";
+  };
+  enableBtn.onmousedown = () => {
+    enableBtn.style.transform = "scale(0.97)";
+  };
+  enableBtn.onmouseup = () => {
+    enableBtn.style.transform = "scale(1.02)";
+  };
+
+  // Use onclick directly (not addEventListener) for proper user gesture detection
   enableBtn.onclick = async () => {
-    try {
-      const permission = await Notification.requestPermission();
-      if (permission === "granted") {
-        banner.remove();
-        if (isExtensionContextValid()) {
-          try {
-            chrome.runtime.sendMessage({
-              type: "RESPONSE_COMPLETE",
-              timestamp: Date.now(),
-              platformIcon: "icons/icon128.png",
-              platform: "AI-CQ",
-              context:
-                "Notifications enabled! You'll now be notified when AI responses complete.",
-            });
-          } catch (msgError) {
-            console.error("[AICQ] Failed to send test notification:", msgError);
-          }
-        }
+    console.log("[AICQ] Enable button clicked");
+
+    // Request notification permission
+    const permission = await Notification.requestPermission();
+    console.log("[AICQ] Permission result:", permission);
+
+    // Always close the banner after user responds
+    container.style.animation =
+      "slideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards";
+    setTimeout(() => container.remove(), 300);
+
+    if (permission === "granted" && isExtensionContextValid()) {
+      try {
+        chrome.runtime.sendMessage({
+          type: "RESPONSE_COMPLETE",
+          timestamp: Date.now(),
+          platformIcon: "icons/icon128.png",
+          platform: "aicq",
+          context:
+            "Notifications enabled! You'll now be notified when AI responses complete.",
+        });
+      } catch (msgError) {
+        console.error("[AICQ] Failed to send test notification:", msgError);
       }
-    } catch (error) {
-      console.error("[AICQ] Failed to request notification permission:", error);
     }
   };
 
   const dismissBtn = document.createElement("button");
-  dismissBtn.textContent = "✕";
+  dismissBtn.textContent = "Dismiss";
   dismissBtn.style.cssText = `
     background: transparent;
-    color: white;
+    color: #737373;
     border: none;
-    padding: 4px 8px;
+    padding: 9px 14px;
     cursor: pointer;
-    font-size: 18px;
-    opacity: 0.8;
-    transition: opacity 0.2s;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 7px;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    pointer-events: auto;
   `;
-  dismissBtn.onmouseover = () => (dismissBtn.style.opacity = "1");
-  dismissBtn.onmouseout = () => (dismissBtn.style.opacity = "0.8");
+  dismissBtn.onmouseover = () => {
+    dismissBtn.style.background = "#fafafa";
+    dismissBtn.style.color = "#171717";
+  };
+  dismissBtn.onmouseout = () => {
+    dismissBtn.style.background = "transparent";
+    dismissBtn.style.color = "#737373";
+  };
   dismissBtn.onclick = () => {
-    banner.remove();
-    sessionStorage.setItem("aicq-banner-dismissed", "true");
+    container.style.animation =
+      "slideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards";
+    setTimeout(() => {
+      container.remove();
+      sessionStorage.setItem("aicq-banner-dismissed", "true");
+    }, 300);
   };
 
   buttonContainer.appendChild(enableBtn);
   buttonContainer.appendChild(dismissBtn);
+  banner.appendChild(iconWrapper);
   banner.appendChild(content);
   banner.appendChild(buttonContainer);
+  container.appendChild(banner);
 
-  document.body.appendChild(banner);
+  document.body.appendChild(container);
   console.log("[AICQ] Notification permission banner displayed");
 }
 
