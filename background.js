@@ -61,9 +61,7 @@ async function shouldShowPushNotification() {
     const prefEnabled = result[STORAGE_KEYS.PUSH_NOTIFICATIONS] !== undefined
       ? result[STORAGE_KEYS.PUSH_NOTIFICATIONS]
       : DEFAULTS.PUSH_NOTIFICATIONS;
-
-    const hasPermission = Notification.permission === 'granted';
-    return prefEnabled && hasPermission;
+    return prefEnabled;
   } catch (error) {
     console.error('[BACKGROUND] Error checking push notification preference:', error);
     return false;
