@@ -91,12 +91,7 @@ function getPlatformIcon(platform) {
   return iconMap[platform] || "icons/icon128.png";
 }
 
-// Notification permission banner is disabled to avoid repeated permission prompts
-function checkNotificationPermission() {
-  return;
-}
-
-// Function to show a banner prompting user to enable notifications
+// Manual opt-in banner implementation (invoke only from explicit user actions)
 function showNotificationBanner() {
   const dismissed = sessionStorage.getItem("aicq-banner-dismissed");
   if (dismissed === "true") {
@@ -326,12 +321,3 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 });
-
-// Initialize when DOM is ready
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => {
-    checkNotificationPermission();
-  });
-} else {
-  checkNotificationPermission();
-}

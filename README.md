@@ -12,7 +12,7 @@ A browser extension that notifies you when ChatGPT, Claude, or Gemini finishes a
 - **Auto-Dismiss**: Notifications disappear automatically after 5 seconds
 - **Quick Navigation**: Click notification to return to the AI chat tab
 
-## Installation (Chrome)
+## Installation (Chrome / Chromium-based Browsers)
 
 1. Download or clone this repository to your local machine
 
