@@ -91,11 +91,9 @@ function getPlatformIcon(platform) {
   return iconMap[platform] || "icons/icon128.png";
 }
 
-// Function to check notification permission and show banner if needed
+// Notification permission banner is disabled to avoid repeated permission prompts
 function checkNotificationPermission() {
-  if (Notification.permission !== "granted") {
-    showNotificationBanner();
-  }
+  return;
 }
 
 // Function to show a banner prompting user to enable notifications

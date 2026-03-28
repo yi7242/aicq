@@ -124,11 +124,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     pushToggle.addEventListener('change', async (e) => {
       const enabled = e.target.checked;
       await savePushNotificationPreference(enabled);
-
-      // If enabling notifications, request permission if not granted
-      if (enabled && Notification.permission === 'default') {
-        await Notification.requestPermission();
-      }
     });
   }
 
