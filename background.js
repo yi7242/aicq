@@ -66,8 +66,8 @@ async function shouldShowPushNotification() {
     }
 
     const declaredPermissions = chrome.runtime.getManifest().permissions || [];
-    const hasPermission = declaredPermissions.includes("notifications");
-    if (!hasPermission) {
+    const hasNotificationPermissionDeclared = declaredPermissions.includes("notifications");
+    if (!hasNotificationPermissionDeclared) {
       return false;
     }
 
