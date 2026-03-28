@@ -12,7 +12,7 @@ A browser extension that notifies you when ChatGPT, Claude, or Gemini finishes a
 - **Auto-Dismiss**: Notifications disappear automatically after 5 seconds
 - **Quick Navigation**: Click notification to return to the AI chat tab
 
-## Installation
+## Installation (Chrome / Chromium-based Browsers)
 
 1. Download or clone this repository to your local machine
 
@@ -22,7 +22,7 @@ A browser extension that notifies you when ChatGPT, Claude, or Gemini finishes a
 
 4. Click "Load unpacked" button
 
-5. Select the directory containing this extension (`NotificationAI`)
+5. Select the directory containing this extension (`aicq`)
 
 6. The extension should now be loaded and active
 
