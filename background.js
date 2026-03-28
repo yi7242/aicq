@@ -61,9 +61,28 @@ async function shouldShowPushNotification() {
     const prefEnabled = result[STORAGE_KEYS.PUSH_NOTIFICATIONS] !== undefined
       ? result[STORAGE_KEYS.PUSH_NOTIFICATIONS]
       : DEFAULTS.PUSH_NOTIFICATIONS;
+    if (!prefEnabled) {
+      return false;
+    }
+
     const declaredPermissions = chrome.runtime.getManifest().permissions || [];
-    const hasNotificationsPermission = declaredPermissions.includes("notifications");
-    return prefEnabled && hasNotificationsPermission;
+    const hasPermission = declaredPermissions.includes("notifications");
+    if (!hasPermission) {
+      return false;
+    }
+
+    const permissionLevel = await new Promise((resolve) => {
+      chrome.notifications.getPermissionLevel((level) => {
+        if (chrome.runtime.lastError) {
+          console.error("[BACKGROUND] Failed to read notification permission level:", chrome.runtime.lastError.message);
+          resolve("denied");
+          return;
+        }
+        resolve(level);
+      });
+    });
+
+    return permissionLevel === "granted";
   } catch (error) {
     console.error('[BACKGROUND] Error checking push notification preference:', error);
     return false;
