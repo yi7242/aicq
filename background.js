@@ -262,6 +262,15 @@ async function handleLLMCompletion(details, platformName, fallbackIcon) {
     return;
   }
 
+  let notificationOptions = {
+    type: "basic",
+    iconUrl: chrome.runtime.getURL(fallbackIcon),
+    title: `${platformName} Response Complete`,
+    message: "Your AI assistant has finished answering!",
+    priority: 2,
+    requireInteraction: false,
+  };
+
   try {
     // Ask content script for notification info (platform, context, icon)
     const response = await chrome.tabs.sendMessage(details.tabId, {
@@ -275,7 +284,7 @@ async function handleLLMCompletion(details, platformName, fallbackIcon) {
       );
 
       // Create notification with info from content script
-      const notificationOptions = {
+      notificationOptions = {
         type: "basic",
         iconUrl: chrome.runtime.getURL(response.platformIcon || fallbackIcon),
         title: `${response.platform} Response Complete`,
@@ -284,23 +293,25 @@ async function handleLLMCompletion(details, platformName, fallbackIcon) {
         priority: 2,
         requireInteraction: false,
       };
-
-      // Create notification
-      chrome.notifications.create(notificationOptions, (notificationId) => {
-        if (notificationId) {
-          console.log("[AICQ-WEBR] Notification created:", notificationId);
-          setTimeout(() => chrome.notifications.clear(notificationId), 5000);
-        } else if (chrome.runtime.lastError) {
-          console.error(
-            "[AICQ-WEBR] Failed to create notification:",
-            chrome.runtime.lastError
-          );
-        }
-      });
+    } else {
+      console.log("[AICQ-WEBR] Notification info unavailable or platform mismatch, using fallback notification");
     }
   } catch (error) {
-    console.log("[AICQ-WEBR] Could not get notification info:", error);
+    console.log("[AICQ-WEBR] Could not get notification info, using fallback notification:", error);
   }
+
+  // Create notification (always attempt even when content script info is unavailable)
+  chrome.notifications.create(notificationOptions, (notificationId) => {
+    if (notificationId) {
+      console.log("[AICQ-WEBR] Notification created:", notificationId);
+      setTimeout(() => chrome.notifications.clear(notificationId), 5000);
+    } else if (chrome.runtime.lastError) {
+      console.error(
+        "[AICQ-WEBR] Failed to create notification:",
+        chrome.runtime.lastError
+      );
+    }
+  });
 }
 
 // Register webRequest listeners for each LLM
